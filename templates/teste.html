@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Flask - Dinâmico</title>
+</head>
+<body>
+    <label for="dropdown1">Dropdown 1:</label>
+    <select id="dropdown1" onchange="updateResult()">
+        {% for opcao in opcoes_dropdown %}
+            <option value="{{ opcao }}">{{ opcao }}</option>
+        {% endfor %}
+    </select>
+
+    <div id="resultado">
+        <h1>Resultado:</h1>
+        <p id="resultado_text">Selecione uma opção no dropdown1.</p>
+    </div>
+
+    <script>
+        function updateResult() {
+            var dropdown1 = document.getElementById("dropdown1");
+            var selectedValue = dropdown1.options[dropdown1.selectedIndex].value;
+
+            var resultadoText = document.getElementById("resultado_text");
+            resultadoText.textContent = "O valor selecionado no dropdown1 é: " + selectedValue;
+        }
+    </script>
+</body>
+</html>
