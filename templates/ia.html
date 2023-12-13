@@ -21,10 +21,9 @@
             <div class="form-group">
                 <label for="opcoes">Selecione uma opção:</label>
                 <select id="opcoes" name="opcoes" class="form-control">
-                    <!-- Coloque aqui as opções do seu dropdown principal -->
-                    <option value="Opcao1">Opcao 1</option>
-                    <option value="Opcao2">Opcao 2</option>
-                    <option value="Opcao3">Opcao 3</option>
+                    {% for opcao in opcoes_dropdown %}
+                        <option value="{{ opcao }}">{{ opcao }}</option>
+                    {% endfor %}
                 </select>
             </div>
 
