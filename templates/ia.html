@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sua Página</title>
+
+    <!-- Adicione o link do Bootstrap se estiver usando -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy8AuB1xPKaI5eI7M5p4c0opkkIsM" crossorigin="anonymous">
+
+    <!-- Adicione o link do jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+
+    <!-- Adicione os scripts do Popper.js e Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-uefMccjAQ/FA3kDoME+Qha77g9TMpyKexYTh7TIcdvZcNQqyyzCxjNET5f4o2cD" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy8AuB1xPKaI5eI7M5p4c0opkkIsM" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <form>
+            <div class="form-group">
+                <label for="opcoes">Selecione uma opção:</label>
+                <select id="opcoes" name="opcoes" class="form-control">
+                    <!-- Coloque aqui as opções do seu dropdown principal -->
+                    <option value="Opcao1">Opcao 1</option>
+                    <option value="Opcao2">Opcao 2</option>
+                    <option value="Opcao3">Opcao 3</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="opcoes_dependentes">Opções Dependentes:</label>
+                <select id="opcoes_dependentes" name="opcoes_dependentes" class="form-control">
+                    <!-- As opções dependentes serão preenchidas dinamicamente usando JavaScript -->
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Quando o dropdown principal é alterado
+            $('#opcoes').change(function() {
+                var opcaoSelecionada = $(this).val();
+
+                // Executa a ação no backend
+                $.post('/executar_acao', {opcoes: opcaoSelecionada}, function(resultado) {
+                    console.log(resultado);
+                    // Aqui você pode fazer algo com o resultado se necessário
+                });
+            });
+        });
+    </script>
+</body>
+</html>
