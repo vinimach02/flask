@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Flask - Simples</title>
+</head>
+<body>
+    <label for="dropdown1">Dropdown 1:</label>
+    <select id="dropdown1" onchange="atualizarDropdown2(this.value)">
+        {% for opcao in opcoes_dropdown %}
+            <option value="{{ opcao }}">{{ opcao }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="dropdown2">Dropdown 2:</label>
+    <select id="dropdown2"></select>
+
+    <script>
+        function atualizarDropdown2(valorDropdown1) {
+            fetch("/atualizar_dropdown2", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: "valor_dropdown1=" + encodeURIComponent(valorDropdown1),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var dropdown2 = document.getElementById("dropdown2");
+                dropdown2.innerHTML = "";  // Limpar opções atuais
+
+                data.opcoes_dropdown2.forEach(opcao => {
+                    var option = document.createElement("option");
+                    option.value = opcao;
+                    option.text = opcao;
+                    dropdown2.add(option);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
