@@ -20,3 +20,21 @@
         });
     });
 </script>
+        $(document).ready(function() {
+            $("#dropdown1").change(function() {
+                var valorDropdown1 = $(this).val();
+                
+                // Enviar uma requisição assíncrona para atualizar o dropdown2
+                $.post("/atualizar_dropdown2", { valor_dropdown1: valorDropdown1 }, function(data) {
+                    preencherDropdown2(data.opcoes_dropdown2);
+                });
+            });
+
+            function preencherDropdown2(opcoesDropdown2) {
+                $("#dropdown2").empty();  // Limpar opções atuais
+
+                $.each(opcoesDropdown2, function(index, opcao) {
+                    $("#dropdown2").append('<option value="' + opcao + '">' + opcao + '</option>');
+                });
+            }
+        });
