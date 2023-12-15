@@ -41,3 +41,40 @@ else:
 
 # Disconnect from vCenter
 Disconnect(si)
+
+
+
+
+#---------------------
+from pyVim import connect
+from pyVmomi import vim
+import ssl
+
+# Desativar a verificação SSL (útil para desenvolvimento, não recomendado para produção)
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+ssl_context.verify_mode = ssl.CERT_NONE
+
+# Substitua com os detalhes do seu vCenter
+VCENTER_SERVER = "seu-vcenter-server"
+USERNAME = "seu-usuario"
+PASSWORD = "sua-senha"
+
+# Conectar ao vCenter
+si = connect.SmartConnect(
+    host=VCENTER_SERVER,
+    user=USERNAME,
+    pwd=PASSWORD,
+    sslContext=ssl_context
+)
+
+# Obter lista de VMs
+content = si.RetrieveContent()
+vm_list = content.viewManager.CreateContainerView(content.rootFolder, [vim.VirtualMachine], True).view
+
+# Exibir informações sobre VMs
+print("Lista de VMs:")
+for vm in vm_list:
+    print(f"Nome: {vm.name}, Estado: {vm.runtime.powerState}")
+
+# Desconectar do vCenter
+connect.Disconnect(si)
