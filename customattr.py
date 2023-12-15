@@ -78,3 +78,50 @@ for vm in vm_list:
 
 # Desconectar do vCenter
 connect.Disconnect(si)
+----------------
+from pyVim import connect
+from pyVmomi import vim
+
+def get_disk_free_space(vm, disk_label):
+    for device in vm.config.hardware.device:
+        if isinstance(device, vim.vm.device.VirtualDisk) and device.deviceInfo.label == disk_label:
+            summary = device.backing.disk
+            return summary.freeSpace
+
+def main():
+    # vCenter connection parameters
+    vcenter_host = "your-vcenter-host"
+    vcenter_user = "your-username"
+    vcenter_password = "your-password"
+
+    # VM and disk information
+    vm_name = "your-vm-name"
+    disk_label = "Hard disk 1"
+
+    # Connect to vCenter server
+    service_instance = connect.SmartConnectNoSSL(host=vcenter_host, user=vcenter_user, pwd=vcenter_password)
+
+    # Find the VM by name
+    content = service_instance.RetrieveContent()
+    vm = None
+    for child in content.rootFolder.childEntity:
+        if hasattr(child, 'vmFolder'):
+            vm_folder = child.vmFolder
+            vm_list = vm_folder.childEntity
+            for curr_vm in vm_list:
+                if curr_vm.name == vm_name:
+                    vm = curr_vm
+                    break
+
+    if vm:
+        # Get disk free space
+        free_space = get_disk_free_space(vm, disk_label)
+        print(f"Free Space on Disk '{disk_label}' of VM '{vm_name}': {free_space} bytes")
+    else:
+        print(f"VM '{vm_name}' not found.")
+
+    # Disconnect from vCenter server
+    connect.Disconnect(service_instance)
+
+if __name__ == "__main__":
+    main()
