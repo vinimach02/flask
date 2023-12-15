@@ -1,5 +1,4 @@
-from pyVim import connect
-from pyVmomi import vim
+import requests
 
 # vCenter connection parameters
 vcenter_host = "your-vcenter-host"
@@ -7,33 +6,28 @@ vcenter_user = "your-username"
 vcenter_password = "your-password"
 
 # VM and disk information
-vm_name = "your-vm-name"
-disk_label = "Hard disk 1"
+vm_id = "your-vm-id"
+disk_id = "your-disk-id"
 
-# Connect to vCenter server
-service_instance = connect.SmartConnectNoSSL(host=vcenter_host, user=vcenter_user, pwd=vcenter_password)
+# Authentication and obtaining the session token
+auth_url = f"https://{vcenter_host}/rest/com/vmware/cis/session"
+auth_response = requests.post(auth_url, auth=(vcenter_user, vcenter_password), verify=False)
+auth_token = auth_response.json()["value"]
 
-# Find the VM by name
-content = service_instance.RetrieveContent()
-vm = None
-container = content.viewManager.CreateContainerView(content.rootFolder, [vim.VirtualMachine], True)
-for managed_object_ref in container.view:
-    if managed_object_ref.name == vm_name:
-        vm = managed_object_ref
-        break
-container.Destroy()
+# Get capacity information for the specified disk
+capacity_url = f"https://{vcenter_host}/rest/vcenter/vm/{vm_id}/hardware/disk/{disk_id}/capacity"
+capacity_response = requests.get(capacity_url, headers={"vmware-api-session-id": auth_token}, verify=False)
+capacity = capacity_response.json()["value"]
 
-# Get disk free space
-if vm:
-    for device in vm.config.hardware.device:
-        if isinstance(device, vim.vm.device.VirtualDisk) and device.deviceInfo.label == disk_label:
-            free_space = device.backing.disk.freeSpace
-            print(f"Free Space on Disk '{disk_label}' of VM '{vm_name}': {free_space} bytes")
-            break
-    else:
-        print(f"Disk '{disk_label}' not found on VM '{vm_name}'.")
-else:
-    print(f"VM '{vm_name}' not found.")
+# Get used space information for the specified disk
+used_space_url = f"https://{vcenter_host}/rest/vcenter/vm/{vm_id}/hardware/disk/{disk_id}"
+used_space_response = requests.get(used_space_url, headers={"vmware-api-session-id": auth_token}, verify=False)
+used_space = used_space_response.json()["value"]
 
-# Disconnect from vCenter server
-connect.Disconnect(service_instance)
+# Calculate free space by subtracting used space from capacity
+free_space = capacity - used_space
+
+# Print the results
+print(f"Capacity: {capacity} bytes")
+print(f"Used Space: {used_space} bytes")
+print(f"Free Space: {free_space} bytes")
