@@ -82,3 +82,51 @@ for vm in vms:
 # Desconectando do vCenter
 Disconnect(si)
 
+
+
+### ------------
+import requests
+
+# Configurações
+username = "<SEU_USUARIO>"
+password = "<SUA_SENHA>"
+vcenter_url = "https://<VCENTER>/rest"
+vm_id_procurado = "vm-6254"  # Substitua pelo ID da sua máquina virtual
+
+# URL da API para obter informações sobre a máquina virtual
+url_vm = f"{vcenter_url}/vcenter/vm/{vm_id_procurado}"
+
+# Configuração do cabeçalho para autenticação básica
+headers = {"Content-Type": "application/json"}
+auth = (username, password)
+
+# Fazendo a solicitação GET
+response = requests.get(url_vm, headers=headers, auth=auth, verify=False)  # Este exemplo desativa a verificação SSL, considere removê-lo em ambientes de produção
+
+# Verifica se a solicitação foi bem-sucedida (código de resposta 200)
+if response.status_code == 200:
+    data_vm = response.json()
+
+    # Obtendo informações da VM e do host
+    vm_name = data_vm["name"]
+    host_id = data_vm["runtime"]["host"]["host"]
+
+    # URL da API para obter informações sobre o host
+    url_host = f"{vcenter_url}/vcenter/host/{host_id}"
+    
+    # Fazendo a solicitação GET para obter informações sobre o host
+    response_host = requests.get(url_host, headers=headers, auth=auth, verify=False)
+
+    if response_host.status_code == 200:
+        data_host = response_host.json()
+        host_name = data_host["name"]
+
+        # Imprimindo as informações
+        print(f"Nome da VM: {vm_name}, Nome do Host: {host_name}")
+    else:
+        print(f"Falha na solicitação do Host. Código de resposta: {response_host.status_code}")
+        print(response_host.text)
+else:
+    print(f"Falha na solicitação da Máquina Virtual. Código de resposta: {response.status_code}")
+    print(response.text)
+
