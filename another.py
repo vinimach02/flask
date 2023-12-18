@@ -43,3 +43,42 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+    
+#### ------------------------------------
+from pyVim.connect import SmartConnect, Disconnect
+from pyVmomi import vim
+import ssl
+
+# Desativando a verificação SSL (somente para testes, não use em ambientes de produção sem verificar certificados)
+ssl._create_default_https_context = ssl._create_unverified_context
+
+# Configurações de conexão
+vcenter_host = "<VCENTER_HOST>"
+username = "<SEU_USUARIO>"
+password = "<SUA_SENHA>"
+
+# Conectando ao vCenter
+si = SmartConnect(host=vcenter_host, user=username, pwd=password, port=443)
+
+# Obtendo o conteúdo do ServiceInstance (root folder)
+content = si.RetrieveContent()
+
+# Obtendo todos os objetos de máquina virtual
+vm_view = content.viewManager.CreateContainerView(content.rootFolder, [vim.VirtualMachine], True)
+vms = vm_view.view
+
+# Iterando sobre as máquinas virtuais
+for vm in vms:
+    # Obtendo o nome da máquina virtual
+    vm_name = vm.summary.config.name
+
+    # Obtendo o nome do host (ESXi) no qual a máquina virtual está sendo executada
+    host_name = vm.runtime.host.summary.config.name
+
+    # Imprimindo as informações
+    print(f"Nome da VM: {vm_name}, Nome do Host: {host_name}")
+
+# Desconectando do vCenter
+Disconnect(si)
+
